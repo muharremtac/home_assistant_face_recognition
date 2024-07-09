@@ -8,6 +8,11 @@ Kendi Home Assistant sunucunuzda çalıştırmak için HOME_ASSISTANT_URL adresi
 
 ## Yükleme
 
+git clone https://github.com/muharremtac/home_assistant_face_recognition.git
+
+cd home_assistant_face_recognition
+
+Uygulamayı pip veya conda ile yükleyebilirsiniz.
 
 ### pip yüklemesi:
 
