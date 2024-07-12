@@ -4,6 +4,8 @@ import cv2
 import face_recognition
 import requests
 import time
+import numpy as np
+import ffmpeg
 
 
 def load_known_faces(base_dir='ids'):
@@ -38,38 +40,70 @@ def send_api_request(name):
     except requests.exceptions.RequestException as e:
         print(f"Unsuccessfull API call: {e}")
 
-
 known_face_encodings, known_face_names = load_known_faces()
 
-os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;udp"
-video_capture = cv2.VideoCapture("rtsp://username:password@ONVIF_URL:554/onvif1",cv2.CAP_FFMPEG)
+rtsp_url = "rtsp://admin:mtac123456@192.168.1.100:554/onvif1"
+
+process = (
+    ffmpeg
+    .input(rtsp_url, rtsp_transport="udp", buffer_size="20M")
+    .output('pipe:', format='rawvideo', pix_fmt='rgb24', vsync='drop', preset='ultrafast', tune='zerolatency')
+    .overwrite_output()
+    .run_async(pipe_stdout=True)
+)
+
+width, height = 1280, 720
+
 
 last_detected_name = None
+last_send_time = time.time()
+send_interval = 60
+
+frame_count = 0
+process_this_frame = True
+
+process_this_frame = True
+frame_skip = 30  # Her 30 karede bir işlem yap
 
 while True:
-    ret, frame = video_capture.read()
+    try:
 
-    face_locations = face_recognition.face_locations(frame)
-    face_encodings = face_recognition.face_encodings(frame, face_locations)
+        in_bytes = process.stdout.read(width * height * 3)
+        if not in_bytes:
+            break
+        frame = np.frombuffer(in_bytes, np.uint8).reshape([height, width, 3])
+        frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 
-    current_time = time.time()
-    for face_encoding in face_encodings:
-        matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
-        name = "Unknown"
+        if process_this_frame:
+            face_locations = face_recognition.face_locations(frame)
+            face_encodings = face_recognition.face_encodings(frame, face_locations)
 
-        if True in matches:
-            first_match_index = matches.index(True)
-            name = known_face_names[first_match_index]
+        process_this_frame = not process_this_frame
+        frame_skip -= 1
+        if frame_skip == 0:
+            process_this_frame = True
+            frame_skip = 30
 
-            if name != last_detected_name or (current_time - last_send_time) >= send_interval:
-                send_api_request(name)
-                last_detected_name = name
-                last_send_time = current_time
+        current_time = time.time()
+        for face_encoding in face_encodings:
+            matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
+            name = "Unknown"
 
-    cv2.imshow('Video', frame)
+            if True in matches:
+                first_match_index = matches.index(True)
+                name = known_face_names[first_match_index]
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+                if name != last_detected_name or (current_time - last_send_time) >= send_interval:
+                    send_api_request(name)
+                    last_detected_name = name
+                    last_send_time = current_time
+        cv2.imshow('Video', frame)
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+    except Exception as e:
+        print(f"Something went wrong: {e}")
+        print("The program is restarting...")
 
 video_capture.release()
 cv2.destroyAllWindows()

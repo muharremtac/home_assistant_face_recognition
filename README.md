@@ -28,7 +28,7 @@ Uygulamayı pip veya conda ile yükleyebilirsiniz.
 #### conda yüklemesi:
 * `conda config --append channels conda-forge`
 * `conda config --append channels bioconda`
-* `conda create -n face_recognize python=3.11 cudatoolkit dlib face_recognition opencv numpy requests`
+* `conda create -n face_recognize python=3.11 ffmpeg-python cudatoolkit dlib face_recognition opencv numpy requests`
 * `conda activate face_recognize`
 
 ## Çalıştırma:
