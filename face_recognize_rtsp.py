@@ -42,7 +42,7 @@ def send_api_request(name):
 
 known_face_encodings, known_face_names = load_known_faces()
 
-rtsp_url = "rtsp://admin:mtac123456@192.168.1.100:554/onvif1"
+rtsp_url = "rtsp://user:password@IP:port/onvif1"
 
 process = (
     ffmpeg
