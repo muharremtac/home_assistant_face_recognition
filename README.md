@@ -39,5 +39,5 @@ USB kamera ile çalıştırmak için:
 MJPEG sunucusu ile çalıştırmak için:
 * `python3 face_recognize_mjpeg.py`
 
-RTSP kamera ile çalıştırmak için:
+RTSP / onvif kamera ile çalıştırmak için:
 * `python3 face_recognize_rtsp.py`
