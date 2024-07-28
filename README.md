@@ -12,10 +12,18 @@ git clone https://github.com/muharremtac/home_assistant_face_recognition.git
 
 cd home_assistant_face_recognition
 
-Uygulamayı pip veya conda ile yükleyebilirsiniz.
+Uygulamayı conda veya pip ile yükleyebilirsiniz.
+
+#### conda yüklemesi:
+* `conda config --append channels conda-forge`
+* `conda config --append channels bioconda`
+* `conda create -n face_recognize python=3.11 ffmpeg-python cudatoolkit dlib face_recognition opencv numpy requests`
+* `conda activate face_recognize`
+
 
 ### pip yüklemesi:
-
+Windows'da yükleme yapacaksanız cmake ve Visual Studio ayarlamaları gerektirmeyen Anaconda öneririm ancak pip ile yükleme yapmak isterseniz dlib yüklemesi için bu makaledeki adımları izleyebilirsiniz:
+https://medium.com/analytics-vidhya/how-to-install-dlib-library-for-python-in-windows-10-57348ba1117f
 * `python3 -m venv face_recognize`
 * `pip3 install -r requirements.txt`
 
@@ -25,11 +33,6 @@ Uygulamayı pip veya conda ile yükleyebilirsiniz.
 #### Windows için
 * `face_recognize\Scripts\activate`
 
-#### conda yüklemesi:
-* `conda config --append channels conda-forge`
-* `conda config --append channels bioconda`
-* `conda create -n face_recognize python=3.11 ffmpeg-python cudatoolkit dlib face_recognition opencv numpy requests`
-* `conda activate face_recognize`
 
 ## Çalıştırma:
 
